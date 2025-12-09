@@ -3,9 +3,11 @@ package com.crud.crud;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -33,7 +35,10 @@ public class EmployeeController {
   // Array ["data1", "data2"]
   @GetMapping("/employees/{id}")
   public Employee getEmployeeById(@PathVariable int id){
-    return employeeList.get(id);
+    return employeeList.stream()
+    .filter(e->e.id == id)
+    .findFirst()
+    .orElse(null);
   }
 
   //CREATE
@@ -44,5 +49,23 @@ public class EmployeeController {
   }
 
   //UPDATE
+  @PutMapping("/employees/{id}")
+  public Employee updateEmployee(@PathVariable int id, @RequestBody Employee employee){
+    Employee employeeById = getEmployeeById(id);
+    employeeById.name = employee.name;
+    employeeById.email = employee.email;
+    employeeById.password = employee.password;
+    employeeById.noreg = employee.noreg;
+
+    employeeList.set(id, employeeById);
+    return employeeById;
+  }
+
   //DELETE
+  @DeleteMapping("/employees/{id}")
+  public void deleteEmployee(@PathVariable int id){
+    Employee employeeById = getEmployeeById(id);
+
+    employeeList.remove(employeeById);
+  }
 }
